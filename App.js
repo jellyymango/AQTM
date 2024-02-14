@@ -1,20 +1,16 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import MainContainer from "./navigation/mainContainer";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Thermometer App</Text>
-      <View style={styles.temperatureContainer}>
-        <Text style={styles.temperature}>98.6°F</Text>
-        {/* You can replace '98.6°F' with the actual temperature data */}
-      </View>
-      <StatusBar style="auto" />
-    </View>
-  );
+function App() {
+  return(
+    <MainContainer/>
+  )
 }
 
+export default App;
+//style={styles.title}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
