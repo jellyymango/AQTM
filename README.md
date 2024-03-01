@@ -10,8 +10,10 @@ This repository contains the source code for the AQTM mobile application. Instru
 
 --Delete all application files besides '.expo' and 'node_modules' folders.
 
---Copy AQTM repository into the ./AQTM folder (it will create nested folder ./AQTM/AQTM).
+--Create new blank folder AQTM to copy repository into.
 
---Cut and paste '.expo' and 'node_modules' folders into the ./AQTM/AQTM repository folder.
+--Copy AQTM repository into the nested folder ./AQTM/AQTM.
+
+--Cut and paste '.expo' and 'node_modules' folders into the ./AQTM/AQTM repository folder (nested AQTM folder will be application folder).
 
 --Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application and display QR code.
