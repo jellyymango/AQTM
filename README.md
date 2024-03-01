@@ -1,3 +1,17 @@
 # AQTM
 
-This repository contains the source code for the AQTM mobile application.
+This repository contains the source code for the AQTM mobile application. Instructions for setting up the development environemnt are as follows:
+
+--Ensure that recent versions of NodeJS, yarn, npm, and npx are installed on the machine.
+
+--Check versions of NodeJS, yarn, npm, and npx inside of a Command Prompt (not Powershell).
+
+--Create project folder './AQTM' with blank Expo Go App inside, using 'npx create-expo-app AQTM'.
+
+--Delete all application files besides '.expo' and 'node_modules' folders.
+
+--Copy AQTM repository into the ./AQTM folder (it will create nested folder ./AQTM/AQTM).
+
+--Cut and paste '.expo' and 'node_modules' folders into the ./AQTM/AQTM repository folder.
+
+--Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application and display QR code.
