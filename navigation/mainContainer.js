@@ -20,6 +20,14 @@ export default function MainContainer() {
             <Tab.Navigator
                 initialRouteName={homeName}
                 screenOptions={({ route }) => ({
+                    
+                    //  Tab Bar Options:
+                    activeTintColor: 'blue',
+                    inactiveTintColor: 'grey',
+                    labelStyle: { paddingBottom: 10, fontSize: 10 },
+                    style: { padding: 10, height: 70 },
+                    
+                    //  Tab Bar Icons
                     tabBarIcon: ({ focused, color, size }) => {
                         let iconName;
                         let rtName = route.name;
@@ -37,12 +45,6 @@ export default function MainContainer() {
                         return <Ionicons name={iconName} size={size} color={color} />;
                     },
                 })}
-                tabBarOptions={{
-                    activeTintColor: 'blue',
-                    inactiveTintColor: 'grey',
-                    labelStyle: { paddingBottom: 10, fontSize: 10 },
-                    style: { padding: 10, height: 70 }
-                }}
             >
                 <Tab.Screen name={homeName} component={Dashboard} />
                 <Tab.Screen name={historyName} component={History} />
