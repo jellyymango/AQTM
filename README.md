@@ -16,4 +16,9 @@ This repository contains the source code for the AQTM mobile application. Instru
 
 --Cut and paste '.expo' and 'node_modules' folders into the ./AQTM/AQTM repository folder (nested AQTM folder will be application folder).
 
+--Inside of ./AQTM/AQTM and inside a Command Prompt, run the following commands to install react SDKs:
+
+    -yarn add react-native-chart-kit
+    -yarn add react-native-svg
+
 --Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application and display QR code.
