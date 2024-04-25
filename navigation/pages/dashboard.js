@@ -3,40 +3,48 @@ import { View, Text, StyleSheet, useState } from 'react-native';
 
 export default function Dashboard({ navigation }) {
     const weatherData = "78";
+    const location = "San Jose, CA";
     const timeData = "11:59";
     const forecastTitle = "Forecast";
-    const weatherDataArray = new Array(7).fill("00");
+    const weatherDataArray = new Array(7).fill("70");
 
     return (
  
         <View style={styles.weatherContainer}>
-     
           <View style={styles.headerContainer}>
-     
             <Text style={styles.tempText}>
-     
+  
               {weatherData}
-     
+    
             </Text>
 
             <Text style={styles.degreeSymbol}>
+
               ˚
+
             </Text>
-     
           </View>
+
+          <View style={styles.locationContainer}>
+            <Text style={styles.locationText}> 
+            
+            
+              {location};
+          
+            </Text>
+          </View>
+
+          
      
           <View style={styles.timeContainer} >
-     
             <Text style={styles.timeText}>
      
               {timeData}
 
             </Text>
-     
           </View>
 
           <View style={styles.forecastTitleContainer}>
-
                 <Text style={styles.forecastTitleText}>
 
                     {forecastTitle}
@@ -44,7 +52,6 @@ export default function Dashboard({ navigation }) {
                 </Text>
 
                 <View style={styles.forecastContainer}>
-
                     {Array(7).fill(null).map((_, index) => (
                         <WeatherForecast key={index} day={" " + (index === 0 ? "Today" : "Mon Tue Wed Thu Fri Sat Sun".split(" ")[index])} weatherData={weatherDataArray[index]} />
                     ))}
@@ -64,19 +71,15 @@ const WeatherForecast = ({ day, weatherData }) => {
   return (
 
       <View style={styles.forecastItemContainer}>
-        
           <Text style={styles.forecastItemText}>
-
               {day}
 
           </Text>
 
           <Text style={styles.forecastItemValueText}>
-
               {weatherData}˚
 
           </Text>
-
       </View>
 
   );
@@ -100,6 +103,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     display: "inline-block",
  
+  },
+
+  locationContainer: {
+
+    flex: 1,
+    backgroundColor: "white",
+    textAlign: "center",
+
+  },
+
+  locationText: {
+    
+    fontSize: 40,
+    color: "black",
+    textAlign: "center",
+
   },
 
   timeContainer: {
@@ -168,7 +187,7 @@ const styles = StyleSheet.create({
  
   tempText: {
  
-    fontSize: 72,
+    fontSize: 96,
     color: "black",
  
   },
