@@ -1,69 +1,20 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, child, get } from "firebase/database";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
-  authDomain: "esp32-aqt.firebaseapp.com",
-  databaseURL: "https://esp32-aqt-default-rtdb.firebaseio.com",
-  projectId: "esp32-aqt",
-  storageBucket: "esp32-aqt.appspot.com",
-  messagingSenderId: "402084669048",
-  appId: "1:402084669048:web:ffa5b767c4090fb8eeaf8d",
-  measurementId: "G-PWF23HQB3X"
-};
-
-const app = initializeApp(firebaseConfig);
-let temperatureValue = null;
-
-function App() {
-  const [temperature, setTemperature] = useState(null);
-  const [humidity, setHumidity] = useState(null);
-
-  useEffect(() => {
-
-    const dbRef = ref(getDatabase(app));
-
-    const getFirstReading = async () => {
-      get(child(dbRef, `testing/1711596706`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          setTemperature(data.temperature);
-          setHumidity(data.humidity);
-          console.log(data.temperature);
-          temperatureValue = data.temperature;
-        } else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    };
-    getFirstReading();
-  }, []);
-
-  return (
-    <Dashboard temperature={temperature} humidity={humidity} />
-  );
-}
-
-export default function Dashboard({ navigation, temperature, humidity }) {
+export default function Dashboard({temperature, humidity }) {
   const location = "San Jose, CA";
   const timeData = "11:59";
   const forecastTitle = "Forecast";
   const weatherDataArray = new Array(7).fill("70");
+  //console.log(temperature);
+  //console.log(humidity);
 
   return (
     <View style={styles.weatherContainer}>
       <View style={styles.headerContainer}>
         <Text style={styles.tempText}>
           
-          {temperatureValue}˚
-        </Text>
-
-        <Text style={styles.degreeSymbol}>
-          ˚
+          {temperature}˚
         </Text>
       </View>
 
@@ -73,40 +24,22 @@ export default function Dashboard({ navigation, temperature, humidity }) {
         </Text>
       </View>
 
+      <View style = {styles.humidityContainer}>
+        <Text style = {styles.humidityText}>
+          Humidity: {humidity} %
+
+        </Text>
+
+      </View>
+
       <View style={styles.timeContainer}>
         <Text style={styles.timeText}>
           {timeData}
         </Text>
       </View>
-
-      <View style={styles.forecastTitleContainer}>
-        <Text style={styles.forecastTitleText}>
-          {forecastTitle}
-        </Text>
-
-        <View style={styles.forecastContainer}>
-          {Array(7).fill(null).map((_, index) => (
-            <WeatherForecast key={index} day={" " + (index === 0? "Today" : "Mon Tue Wed Thu Fri Sat Sun".split(" ")[index])} weatherData={weatherDataArray[index]} />
-          ))}
-        </View>
-      </View>
     </View>
   );
 }
-
-const WeatherForecast = ({ day, weatherData }) => {
-  return (
-    <View style={styles.forecastItemContainer}>
-      <Text style={styles.forecastItemText}>
-        {day}
-      </Text>
-
-      <Text style={styles.forecastItemValueText}>
-        {weatherData}˚
-      </Text>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   weatherContainer: {
@@ -131,6 +64,17 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
   },
+  humidityContainer: {
+    flex: 1,
+    backgroundColor: "white",
+    textAlign: "center",
+  },
+  humidityText: {
+    fontSize: 24,
+    color: "black",
+    textAlign: "center",
+  },
+
   timeContainer: {
     flex: 1,
     justifyContent: "flex-end",

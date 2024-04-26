@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import MainContainer from "./navigation/mainContainer";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get } from "firebase/database";
+import Dashboard from "./navigation/pages/dashboard";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
@@ -44,7 +45,7 @@ function App() {
   }, []);
 
   return (
-    <MainContainer temperature={temperature} humidity={humidity} data = {data}/>
+    <Dashboard temperature={temperature} humidity={humidity}/>
   );
 }
 
