@@ -32,6 +32,8 @@ export default function Dashboard({temperature, humidity }) {
 
       </View>
 
+      
+
       <View style={styles.timeContainer}>
         <Text style={styles.timeText}>
           {timeData}

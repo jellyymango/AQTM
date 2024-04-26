@@ -24,24 +24,39 @@ function App() {
   const [humidity, setHumidity] = useState(null);
 
   useEffect(() => {
-
     const dbRef = ref(getDatabase(app));
 
-    const getFirstReading = async () => {
-      get(child(dbRef, `testing/1711596706`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          data = snapshot.val();
-          setTemperature(data.temperature);
-          setHumidity(data.humidity);
-          console.log(data.temperature);
-        } else {
-          console.log("No data available");
+    const getLatestReading = async () => {
+      const testingRef = child(dbRef, 'testing');
+      
+      // Fetch all data from the "testing" folder
+      const snapshot = await get(testingRef);
+      
+      // Initialize variables to store the latest timestamp and corresponding data
+      let latestTimestamp = 0;
+      let latestData = null;
+
+      // Iterate over the data to find the entry with the highest timestamp
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        if (data.timestamp > latestTimestamp) {
+          latestTimestamp = data.timestamp;
+          latestData = data;
         }
-      }).catch((error) => {
-        console.error(error);
       });
+
+      // If no data is found, log a message
+      if (!latestData) {
+        console.log("No data available");
+        return;
+      }
+
+      // Set temperature and humidity based on the data with the highest timestamp
+      setTemperature(latestData.temperature);
+      setHumidity(latestData.humidity);
     };
-    getFirstReading();
+
+    getLatestReading();
   }, []);
 
   return (
