@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import MainContainer from "./navigation/mainContainer";
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get } from "firebase/database";
 import Dashboard from "./navigation/pages/dashboard";
+import History from "./navigation/pages/history";
+import Settings from "./navigation/pages/settings";
+import Alerts from "./navigation/pages/alerts";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
@@ -18,8 +22,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-let data = null;
-function App() {
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
 
@@ -60,29 +66,41 @@ function App() {
   }, []);
 
   return (
-    <Dashboard temperature={temperature} humidity={humidity}/>
+    <NavigationContainer>
+      <Tab.Navigator
+          initialRouteName="Dashboard"
+          screenOptions={({ route }) => ({
+              // Tab Bar Options:
+              activeTintColor: 'blue',
+              inactiveTintColor: 'grey',
+              labelStyle: { paddingBottom: 10, fontSize: 10 },
+              style: { padding: 10, height: 70 },
+              // Tab Bar Icons
+              tabBarIcon: ({ focused, color, size }) => {
+                  let iconName;
+                  const routeName = route.name;
+
+                  if (routeName === "Dashboard") {
+                      iconName = focused ? 'home' : 'home-outline';
+                  } else if (routeName === "History") {
+                      iconName = focused ? 'bar-chart' : 'bar-chart-outline';
+                  } else if (routeName === "Settings") {
+                      iconName = focused ? 'settings' : 'settings-outline';
+                  } else if (routeName === "Alerts") {
+                      iconName = focused ? 'warning' : 'warning-outline';
+                  }
+
+                  return <Ionicons name={iconName} size={size} color={color} />;
+              },
+          })}
+      >
+          <Tab.Screen name="Dashboard">
+              {() => <Dashboard temperature={temperature} humidity={humidity} />}
+          </Tab.Screen>
+          <Tab.Screen name="History" component={History} />
+          <Tab.Screen name="Settings" component={Settings} />
+          <Tab.Screen name="Alerts" component={Alerts} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-export default App;
-//style={styles.title}
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  temperatureContainer: {
-    alignItems: "center",
-  },
-  temperature: {
-    fontSize: 36,
-    fontWeight: "bold",
-  },
-});
