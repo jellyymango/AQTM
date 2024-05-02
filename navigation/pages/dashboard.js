@@ -1,27 +1,56 @@
 import * as React from 'react';
+import * as Location from 'expo-location';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function Dashboard({temperature, humidity }) {
-  const location = "San Jose, CA";
-  const timeData = "11:59";
-  const forecastTitle = "Forecast";
-  const weatherDataArray = new Array(7).fill("70");
+  const [timeData, setTimeData] = useState(new Date());
+  const [location, setLocation] = useState(null);
+  const [locationErr, setLocationErr] = useState(null);
   //console.log(temperature);
   //console.log(humidity);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTimeData(new Date());
+    }, 30000); // update every 30 sec
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        let location = await Location.getCurrentPositionAsync({});
+        let reverseGeocode = await Location.reverseGeocodeAsync(location.coords);
+        let city = reverseGeocode[0].city;
+        let state = reverseGeocode[0].region;
+        setLocation({ city, state });
+      } else {
+        setLocationErr('Location access denied :(');
+      }
+    })();
+  }, []);
+
+  const formattedTime = timeData.toLocaleTimeString().replace(/:\d{2}\s/, ' ');
+
   return (
-    <View style={styles.weatherContainer}>
-      <View style={styles.headerContainer}>
+    <View style={styles.tempContainer}>
+      <View style={styles.tempHeader}>
         <Text style={styles.tempText}>
-          
           {temperature}˚
+
         </Text>
       </View>
 
       <View style={styles.locationContainer}>
-        <Text style={styles.locationText}>
-          {location}
-        </Text>
+        {location? (
+          <Text style={styles.locationText}>
+            {location.city}, {location.state}
+          </Text>
+        ) : (
+          <Text>{locationErr}</Text>
+        )}
       </View>
 
       <View style = {styles.humidityContainer}>
@@ -29,14 +58,12 @@ export default function Dashboard({temperature, humidity }) {
           Humidity: {humidity} %
 
         </Text>
-
       </View>
-
-      
 
       <View style={styles.timeContainer}>
         <Text style={styles.timeText}>
-          {timeData}
+        {formattedTime}
+
         </Text>
       </View>
     </View>
@@ -44,17 +71,21 @@ export default function Dashboard({temperature, humidity }) {
 }
 
 const styles = StyleSheet.create({
-  weatherContainer: {
+  tempContainer: {
     flex: 1,
     backgroundColor: "white",
     textAlign: "center",
   },
-  headerContainer: {
+  tempHeader: {
     flexDirection: "row",
     marginTop: 100,
     alignItems: "center",
     justifyContent: "center",
     display: "inline-block",
+  },
+  tempText: {
+    fontSize: 96,
+    color: "black",
   },
   locationContainer: {
     flex: 1,
@@ -82,45 +113,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 100,
-  },
-  forecastContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 10,
-    padding: 12,
-  },
-  forecastItemContainer: {
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 10,
-    width: "14%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  forecastItemText: {
-    fontSize: 15,
-    color: "black",
-  },
-  forecastItemValueText: {
-    fontSize: 20,
-    color: "black",
-    marginTop: 10,
-  },
-  forecastTitleText: {
-    fontSize: 40,
-    color: "black",
-    alignSelf: "center",
-  },
-  forecastTitleContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 100,
-  },
-  tempText: {
-    fontSize: 96,
-    color: "black",
   },
   degreeSymbol:{
     fontSize: 72,

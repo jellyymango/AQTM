@@ -21,6 +21,7 @@ This repository contains the source code for the AQTM mobile application. Instru
     -yarn add react-native-chart-kit
     -yarn add react-native-svg
     -npm i @expo/webpack-config
+    -npx expo install expo-location
 
 --If any remaining dependencies are specified as uninstalled, follow instructions to install them
 
