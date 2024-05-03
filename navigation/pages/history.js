@@ -1,47 +1,112 @@
-import * as React from 'react';
+import React, { useState, useEffect } from "react";
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { getDatabase, ref, child, get } from "firebase/database";
+import { initializeApp } from "firebase/app"; // Import initializeApp from Firebase
+
+function averageData(data, targetSize) {
+  if (data.length <= targetSize) {
+    return data; // Return the original data if its length is less than or equal to the target size
+  }
+
+  const intervalSize = Math.ceil(data.length / targetSize); // Calculate the interval size
+  const averagedData = []; // Array to store averaged data
+
+  // Loop through the original data array in intervals
+  for (let i = 0; i < data.length; i += intervalSize) {
+    let sum = 0;
+    let count = 0;
+
+    // Calculate the sum of data points in the current interval
+    for (let j = i; j < i + intervalSize && j < data.length; j++) {
+      sum += parseFloat(data[j]); // Parse the value as a float before adding to the sum
+      count++;
+    }
+
+    // Calculate the average of the current interval
+    const average = count > 0 ? sum / count : 0; // Prevent division by zero
+
+    // Add the average to the averagedData array
+    averagedData.push(average);
+  }
+
+  return averagedData;
+}
 
 const History = ({ navigation }) => {
-  const [data, setData] = React.useState([
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [humidityData, setHumidityData] = useState([]);
+
+  // Initialize Firebase app
+  const firebaseConfig = {
+    apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
+    authDomain: "esp32-aqt.firebaseapp.com",
+    databaseURL: "https://esp32-aqt-default-rtdb.firebaseio.com",
+    projectId: "esp32-aqt",
+    storageBucket: "esp32-aqt.appspot.com",
+    messagingSenderId: "402084669048",
+    appId: "1:402084669048:web:ffa5b767c4090fb8eeaf8d",
+    measurementId: "G-PWF23HQB3X"
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase(app));
+  
+    const readAllData = async () => {
+      const testingRef = child(dbRef, 'testing');
+  
+      // Fetch all data from the "testing" folder
+      const snapshot = await get(testingRef);
+  
+      // Initialize arrays to store temperature and humidity data
+      let temperatureReadings = [];
+      let humidityReadings = [];
+  
+      // Iterate over all readings
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        // Push temperature and humidity data to respective arrays
+        temperatureReadings.push(data.temperature);
+        humidityReadings.push(data.humidity);
+      });
+  
+      // Update state with the arrays of temperature and humidity data
+      setTemperatureData(temperatureReadings);
+      setHumidityData(humidityReadings);
+    };
+  
+    readAllData(); // Call the function to fetch all data when the component mounts
+  
+  }, [app]); // Add app to dependency array to trigger useEffect when it changes
+
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+  let dailyData = temperatureData.slice(Math.max(temperatureData.length - 100, 0)).reverse();
+  let weeklyData = temperatureData.slice(Math.max(temperatureData.length - 750, 0)).reverse();
+  let monthlyData = temperatureData.slice(Math.max(temperatureData.length - 150000, 0)).reverse();
+  const data = [
     {
-      labels: ['12am', '3am', '6am', '9am', '12pm', '3pm', '6pm', '9pm'],
+      labels: ['Daily'],
       datasets: [
         {
-          data: [
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-            Math.floor(Math.random() * 20) + 50,
-          ],
+          data: averageData(dailyData,50),
           color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
           strokeWidth: 2,
         },
-        { //line 1
-            data: [0, 120],
-            color: (opacity = 255) => `rgba(255, 255, 255, ${opacity})`, // Transparent line color
-            strokeWidth: 0, // Line width
-            
-          },
+        {
+          data: [21, 23],
+          color: (opacity = 255) => `rgba(255, 255, 255, ${opacity})`, // Transparent line color
+          strokeWidth: 0, // Line width
+        },
       ],
     },
     {
-      labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      labels: ['Weekly'],
       datasets: [
         {
-          data: [
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-            Math.floor(Math.random() * 10) + 50,
-          ],
+          data: averageData(weeklyData,50),
           color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
           strokeWidth: 2,
         },
@@ -54,23 +119,10 @@ const History = ({ navigation }) => {
       ],
     },
     {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      labels: ['Monthly'],
       datasets: [
         {
-          data: [
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-            Math.floor(Math.random() * 5) + 50,
-          ],
+          data: averageData(monthlyData,50),
           color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
           strokeWidth: 2,
         },
@@ -82,9 +134,7 @@ const History = ({ navigation }) => {
           },
       ],
     },
-  ]);
-
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  ];
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -98,31 +148,32 @@ const History = ({ navigation }) => {
         width={Dimensions.get('window').width - 32}
         height={560}
         yAxisLabel=""
-        yAxisSuffix="°F"
-        yAxisInterval={10}
-        yAxisMin={40}
-        yAxisMax={90}
+        yAxisSuffix="°C"
+        yAxisInterval={5}
+        yAxisMin={10}
+        yAxisMax={50}
         chartConfig={{
           backgroundColor: '#f5f5f5',
           backgroundGradientFrom: '#f5f5f5',
           backgroundGradientTo: '#f5f5f5',
           fillShadowGradient: 'transparent',
           useShadowColorFromDataset: true,
-         DECIMALPLACES: 1,
+          DECIMALPLACES: 1,
           color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          formatXLabel: (value) => {
+            // Customize the X-axis labels here
+            return value.toString(); // You can format the label as needed
+          },
+          formatYLabel: (value) => {
+            // Customize the Y-axis labels here
+            return value.toString(); // You can format the label as needed
+          },
         }}
         style={{
           marginVertical: 5,
           borderRadius: 16,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
+          backgroundColor: 'white', // Set background color
         }}
       />
       <View
