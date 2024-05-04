@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Switch, TextInput, StyleSheet } from 'react-native';
 
-const SettingsPage = () => {
+export default function SettingsPage({ temperatureUnit, setTemperatureUnit }) {
   // State variables for appearance and notification settings
   const [darkMode, setDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -24,6 +24,19 @@ const SettingsPage = () => {
           <Text>Dark Mode</Text>
           <Switch value={darkMode} onValueChange={setDarkMode} />
         </View>
+
+        <View style={styles.setting}>
+        <Text>Temperature Unit:</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text>{temperatureUnit === 'Fahrenheit'? 'Fahrenheit' : 'Celsius'}</Text>
+            <View style={{ width: 10 }} /> 
+            <Switch
+              value={temperatureUnit === 'Fahrenheit'}
+              onValueChange={() => setTemperatureUnit(temperatureUnit === 'Fahrenheit'? 'Celsius' : 'Fahrenheit')}
+            />
+          </View>
+        </View>
+        
       </View>
       {/* Display notification settings */}
       <View style={styles.section}>
@@ -87,7 +100,7 @@ const SettingsPage = () => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -126,5 +139,3 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-
-export default SettingsPage;

@@ -3,10 +3,12 @@ import * as Location from 'expo-location';
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function Dashboard({temperature, humidity }) {
+export default function Dashboard({temperature, humidity, temperatureUnit }) {
   const [timeData, setTimeData] = useState(new Date());
+  const formattedTime = timeData.toLocaleTimeString().replace(/:\d{2}\s/, ' ');
   const [location, setLocation] = useState(null);
   const [locationErr, setLocationErr] = useState(null);
+  let tempValue = temperatureUnit === 'Fahrenheit'? (temperature * 9 / 5) + 32 : temperature;
   //console.log(temperature);
   //console.log(humidity);
 
@@ -32,14 +34,16 @@ export default function Dashboard({temperature, humidity }) {
     })();
   }, []);
 
-  const formattedTime = timeData.toLocaleTimeString().replace(/:\d{2}\s/, ' ');
-
   return (
     <View style={styles.tempContainer}>
       <View style={styles.tempHeader}>
         <Text style={styles.tempText}>
-          {temperature}˚
-
+          {temperature!== null? (
+              <>{Math.round(tempValue)}˚{temperatureUnit === 'Fahrenheit'? 'F' : 'C'}</>
+            ) : (
+              <Text>...</Text>
+            )
+          }
         </Text>
       </View>
 

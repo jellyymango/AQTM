@@ -28,6 +28,7 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
+  const [temperatureUnit, setTemperatureUnit] = useState('Fahrenheit');
 
   useEffect(() => {
     const dbRef = ref(getDatabase(app));
@@ -95,11 +96,13 @@ export default function App() {
           })}
       >
           <Tab.Screen name="Dashboard">
-              {() => <Dashboard temperature={temperature} humidity={humidity} />}
+              {() => <Dashboard temperature={temperature} humidity={humidity} temperatureUnit={temperatureUnit} />}
           </Tab.Screen>
           <Tab.Screen name="History" component={History} />
           <Tab.Screen name="Alerts" component={Alerts} />
-          <Tab.Screen name="Settings" component={Settings} />
+          <Tab.Screen name="Settings">
+              {() => <Settings temperatureUnit={temperatureUnit} setTemperatureUnit={setTemperatureUnit} />}
+          </Tab.Screen>
           
       </Tab.Navigator>
     </NavigationContainer>
