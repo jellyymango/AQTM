@@ -4,6 +4,11 @@ import { LineChart } from 'react-native-chart-kit';
 import { getDatabase, ref, child, get } from "firebase/database";
 import { initializeApp } from "firebase/app"; // Import initializeApp from Firebase
 
+// Function to convert Unix timestamp to JavaScript Date object
+function unixTimestampToDate(unixTimestamp) {
+    return new Date(unixTimestamp * 1000);
+}
+
 function averageData(data, targetSize) {
   if (data.length <= targetSize) {
     return data; // Return the original data if its length is less than or equal to the target size
@@ -36,6 +41,9 @@ function averageData(data, targetSize) {
 const History = ({ navigation }) => {
   const [temperatureData, setTemperatureData] = useState([]);
   const [humidityData, setHumidityData] = useState([]);
+  const [previousDayTimestamps, setPreviousDayTimestamps] = useState([]);
+  const [previousWeekTimestamps, setPreviousWeekTimestamps] = useState([]);
+  const [previousMonthTimestamps, setPreviousMonthTimestamps] = useState([]);
 
   // Initialize Firebase app
   const firebaseConfig = {
@@ -63,18 +71,43 @@ const History = ({ navigation }) => {
       // Initialize arrays to store temperature and humidity data
       let temperatureReadings = [];
       let humidityReadings = [];
+      let previousDayTimestampsArr = [];
+      let previousWeekTimestampsArr = [];
+      let previousMonthTimestampsArr = [];
   
       // Iterate over all readings
       snapshot.forEach((childSnapshot) => {
         const data = childSnapshot.val();
+        const timestamp = data.timestamp;
         // Push temperature and humidity data to respective arrays
         temperatureReadings.push(data.temperature);
         humidityReadings.push(data.humidity);
+        // Check if the timestamp is within the previous day, week, or month
+        const date = unixTimestampToDate(timestamp);
+        const currentDate = new Date();
+        const oneDayAgo = new Date(currentDate);
+        oneDayAgo.setDate(currentDate.getDate() - 1);
+        const oneWeekAgo = new Date(currentDate);
+        oneWeekAgo.setDate(currentDate.getDate() - 7);
+        const oneMonthAgo = new Date(currentDate);
+        oneMonthAgo.setMonth(currentDate.getMonth() - 1);
+        if (date > oneDayAgo) {
+          previousDayTimestampsArr.push(timestamp);
+        }
+        if (date > oneWeekAgo) {
+          previousWeekTimestampsArr.push(timestamp);
+        }
+        if (date > oneMonthAgo) {
+          previousMonthTimestampsArr.push(timestamp);
+        }
       });
   
       // Update state with the arrays of temperature and humidity data
       setTemperatureData(temperatureReadings);
       setHumidityData(humidityReadings);
+      setPreviousDayTimestamps(previousDayTimestampsArr);
+      setPreviousWeekTimestamps(previousWeekTimestampsArr);
+      setPreviousMonthTimestamps(previousMonthTimestampsArr);
     };
   
     readAllData(); // Call the function to fetch all data when the component mounts
@@ -88,7 +121,12 @@ const History = ({ navigation }) => {
   let monthlyData = temperatureData.slice(Math.max(temperatureData.length - 150000, 0)).reverse();
   const data = [
     {
-      labels: ['Daily'],
+      labels: previousDayTimestamps
+        .filter((_, index) => index % Math.ceil(previousDayTimestamps.length / 4) === 0)
+        .map(timestamp => {
+          const date = unixTimestampToDate(timestamp);
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Only time without seconds
+        }),
       datasets: [
         {
           data: averageData(dailyData,50),
@@ -96,14 +134,16 @@ const History = ({ navigation }) => {
           strokeWidth: 2,
         },
         {
-          data: [21, 23],
+          data: [],
           color: (opacity = 255) => `rgba(255, 255, 255, ${opacity})`, // Transparent line color
           strokeWidth: 0, // Line width
         },
       ],
     },
     {
-      labels: ['Weekly'],
+      labels: previousWeekTimestamps
+        .filter((_, index) => index % Math.ceil(previousWeekTimestamps.length / 5) === 0)
+        .map(timestamp => unixTimestampToDate(timestamp).toLocaleDateString()),
       datasets: [
         {
           data: averageData(weeklyData,50),
@@ -111,7 +151,7 @@ const History = ({ navigation }) => {
           strokeWidth: 2,
         },
         { //line 1
-            data: [0, 120],
+            data: [],
             color: (opacity = 255) => `rgba(255, 255, 255, ${opacity})`, // Transparent line color
             strokeWidth: 0, // Line width
             
@@ -119,7 +159,9 @@ const History = ({ navigation }) => {
       ],
     },
     {
-      labels: ['Monthly'],
+      labels: previousMonthTimestamps
+        .filter((_, index) => index % Math.ceil(previousMonthTimestamps.length / 4) === 0) // Reduce by one label
+        .map(timestamp => unixTimestampToDate(timestamp).toLocaleDateString()),
       datasets: [
         {
           data: averageData(monthlyData,50),
@@ -127,7 +169,7 @@ const History = ({ navigation }) => {
           strokeWidth: 2,
         },
         { //line 1
-            data: [0, 120],
+            data: [],
             color: (opacity = 255) => `rgba(255, 255,255, ${opacity})`, // Transparent line color
             strokeWidth: 0, // Line width
             
@@ -162,8 +204,8 @@ const History = ({ navigation }) => {
           color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           formatXLabel: (value) => {
-            // Customize the X-axis labels here
-            return value.toString(); // You can format the label as needed
+            // Convert Unix timestamp to human-readable date
+            return value; // You can format the label as needed
           },
           formatYLabel: (value) => {
             // Customize the Y-axis labels here
