@@ -8,7 +8,7 @@ const SettingsPage = ({ temperatureUnit, setTemperatureUnit, notificationsEnable
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+      <Text style={styles.title}></Text>
 
       {/* Appearance Settings */}
       <View style={styles.section}>

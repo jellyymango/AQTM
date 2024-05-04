@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get } from "firebase/database";
 
@@ -27,16 +27,16 @@ const keyAlias = {
   timestamp: 'Timestamp'
 };
 
+const excludedKeys = ['Altitude', 'timestamp']; // Keys to exclude from display and comparison
+
 const AlertsPage = ({ notificationsEnabled }) => {
   const [thresholds, setThresholds] = useState({
-    Altitude: '0',
     Formaldehyde: '0',
     NOX: '0',
     VOC: '0',
     humidity: '0',
     pressure: '0',
     temperature: '0',
-    timestamp: '0'
   });
   const [latestReadings, setLatestReadings] = useState(null);
   const [breachedThresholds, setBreachedThresholds] = useState({});
@@ -79,13 +79,15 @@ const AlertsPage = ({ notificationsEnabled }) => {
 
     const breached = {};
 
-    // Perform comparison with latest readings
+    // Perform comparison with latest readings, excluding Altitude and timestamp
     Object.entries(thresholds).forEach(([key, value]) => {
-      const latestValue = parseFloat(latestData[key]);
-      const thresholdValue = parseFloat(value);
+      if (!excludedKeys.includes(key)) {
+        const latestValue = parseFloat(latestData[key]);
+        const thresholdValue = parseFloat(value);
 
-      if (!isNaN(latestValue) && latestValue > thresholdValue) {
-        breached[key] = latestValue; // Store the latest reading that breached the threshold
+        if (!isNaN(latestValue) && latestValue > thresholdValue) {
+          breached[key] = latestValue; // Store the latest reading that breached the threshold
+        }
       }
     });
 
@@ -127,20 +129,25 @@ const AlertsPage = ({ notificationsEnabled }) => {
 
             <Text style={styles.title}>Thresholds</Text>
 
-            {/* Render inputs for threshold settings */}
-            {Object.keys(thresholds).map((key) => (
-              <View key={key} style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>{`Enter ${keyAlias[key]} threshold:`}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={thresholds[key]}
-                  onChangeText={(value) => setThresholds((prev) => ({ ...prev, [key]: value }))}
-                  keyboardType="numeric"
-                  placeholder={`Enter ${keyAlias[key]} threshold`}
-                  onFocus={() => handleInputFocus(key)}
-                />
-              </View>
-            ))}
+            {/* Render inputs for threshold settings, excluding Altitude and timestamp */}
+            {Object.keys(thresholds).map((key) => {
+              if (!excludedKeys.includes(key)) {
+                return (
+                  <View key={key} style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>{`Enter ${keyAlias[key]} threshold:`}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={thresholds[key]}
+                      onChangeText={(value) => setThresholds((prev) => ({ ...prev, [key]: value }))}
+                      keyboardType="numeric"
+                      placeholder={`Enter ${keyAlias[key]} threshold`}
+                      onFocus={() => handleInputFocus(key)}
+                    />
+                  </View>
+                );
+              }
+              return null;
+            })}
 
             {/* Save Thresholds Button */}
             <TouchableOpacity style={styles.saveButton} onPress={saveThresholdSettings}>
