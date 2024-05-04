@@ -84,10 +84,10 @@ export default function App() {
                       iconName = focused ? 'home' : 'home-outline';
                   } else if (routeName === "History") {
                       iconName = focused ? 'bar-chart' : 'bar-chart-outline';
-                  } else if (routeName === "Settings") {
-                      iconName = focused ? 'settings' : 'settings-outline';
-                  } else if (routeName === "Alerts") {
+                  }  else if (routeName === "Alerts") {
                       iconName = focused ? 'warning' : 'warning-outline';
+                  }  else if (routeName === "Settings") {
+                      iconName = focused ? 'settings' : 'settings-outline';
                   }
 
                   return <Ionicons name={iconName} size={size} color={color} />;
@@ -98,8 +98,9 @@ export default function App() {
               {() => <Dashboard temperature={temperature} humidity={humidity} />}
           </Tab.Screen>
           <Tab.Screen name="History" component={History} />
-          <Tab.Screen name="Settings" component={Settings} />
           <Tab.Screen name="Alerts" component={Alerts} />
+          <Tab.Screen name="Settings" component={Settings} />
+          
       </Tab.Navigator>
     </NavigationContainer>
   );
