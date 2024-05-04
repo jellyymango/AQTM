@@ -18,8 +18,8 @@ const app = initializeApp(firebaseConfig);
 
 // Alias mapping for displaying keys with consistent capitalization
 const keyAlias = {
-  altitude: 'Altitude',
-  formaldehyde: 'Formaldehyde',
+  Altitude: 'Altitude',
+  Formaldehyde: 'Formaldehyde',
   NOX: 'NOX',
   VOC: 'VOC',
   humidity: 'Humidity',
@@ -30,8 +30,8 @@ const keyAlias = {
 
 const AlertsPage = () => {
   const [thresholds, setThresholds] = useState({
-    altitude: '0',
-    formaldehyde: '0',
+    Altitude: '0',
+    Formaldehyde: '0',
     NOX: '0',
     VOC: '0',
     humidity: '0',
