@@ -17,13 +17,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const keyAlias = {
-  Altitude: 'Altitude',
-  Formaldehyde: 'Formaldehyde',
-  NOX: 'NOX',
-  VOC: 'VOC',
-  humidity: 'Humidity',
-  pressure: 'Pressure',
-  temperature: 'Temperature',
+  Altitude: 'Altitude (m)',
+  Formaldehyde: 'Formaldehyde (PPM)',
+  NOX: 'NOX Index',
+  VOC: 'VOC Index',
+  humidity: 'Humidity (%)',
+  pressure: 'Pressure (Pa)',
+  temperature: 'Temperature (°C)',
   timestamp: 'Timestamp'
 };
 
@@ -31,12 +31,12 @@ const excludedKeys = ['Altitude', 'timestamp']; // Keys to exclude from display 
 
 const AlertsPage = ({ notificationsEnabled }) => {
   const [thresholds, setThresholds] = useState({
-    Formaldehyde: '0',
+    Formaldehyde: '0 PPM',
     NOX: '0',
     VOC: '0',
-    humidity: '0',
-    pressure: '0',
-    temperature: '0',
+    humidity: '0 %',
+    pressure: '0 Pa',
+    temperature: '0 °C',
   });
   const [latestReadings, setLatestReadings] = useState(null);
   const [breachedThresholds, setBreachedThresholds] = useState({});
@@ -83,10 +83,14 @@ const AlertsPage = ({ notificationsEnabled }) => {
     Object.entries(thresholds).forEach(([key, value]) => {
       if (!excludedKeys.includes(key)) {
         const latestValue = parseFloat(latestData[key]);
-        const thresholdValue = parseFloat(value);
+        const thresholdValue = parseFloat(value.replace(/[^0-9\.]/g, '')); // Remove units from threshold value
 
         if (!isNaN(latestValue) && latestValue > thresholdValue) {
-          breached[key] = latestValue; // Store the latest reading that breached the threshold
+          breached[key] = {
+            latestValue: `${latestValue}`,
+            thresholdValue: `${thresholdValue}`,
+            unit: keyAlias[key].split(' ')[1]
+          };
         }
       }
     });
@@ -96,7 +100,7 @@ const AlertsPage = ({ notificationsEnabled }) => {
   };
 
   const handleInputFocus = (key) => {
-    const updatedThresholds = { ...thresholds };
+    const updatedThresholds = {...thresholds };
     updatedThresholds[key] = ''; // Clear the value to start fresh
     setThresholds(updatedThresholds);
   };
@@ -109,7 +113,7 @@ const AlertsPage = ({ notificationsEnabled }) => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <ScrollView>
-        {!notificationsEnabled ? (
+        {!notificationsEnabled? (
           <View style={styles.disabledContainer}>
             <Text style={styles.disabledText}>Notifications Disabled</Text>
           </View>
@@ -118,16 +122,17 @@ const AlertsPage = ({ notificationsEnabled }) => {
             {Object.keys(breachedThresholds).length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Breached Thresholds</Text>
-                {Object.entries(breachedThresholds).map(([key, latestValue]) => (
+                {Object.entries(breachedThresholds).map(([key, {latestValue, thresholdValue, unit}]) => (
                   <View key={key} style={styles.breachedContainer}>
                     <Text>{`Threshold of ${keyAlias[key]} was exceeded.`}</Text>
-                    <Text>{`Latest reading of ${keyAlias[key]} was ${latestValue}`}</Text>
+                    <Text>{`Latest reading of ${keyAlias[key].split(' ')[0]} was ${latestValue} ${unit}.`}</Text>
+                    <Text>{`Threshold value was ${thresholdValue} ${unit}.`}</Text>
                   </View>
                 ))}
               </View>
             )}
 
-            <Text style={styles.title}>Thresholds</Text>
+            <Text style={styles.title}></Text>
 
             {/* Render inputs for threshold settings, excluding Altitude and timestamp */}
             {Object.keys(thresholds).map((key) => {
