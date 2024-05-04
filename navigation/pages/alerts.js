@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get } from "firebase/database";
 
@@ -16,7 +16,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Alias mapping for displaying keys with consistent capitalization
 const keyAlias = {
   Altitude: 'Altitude',
   Formaldehyde: 'Formaldehyde',
@@ -28,7 +27,7 @@ const keyAlias = {
   timestamp: 'Timestamp'
 };
 
-const AlertsPage = () => {
+const AlertsPage = ({ notificationsEnabled }) => {
   const [thresholds, setThresholds] = useState({
     Altitude: '0',
     Formaldehyde: '0',
@@ -72,11 +71,6 @@ const AlertsPage = () => {
     fetchLatestReading();
   }, []);
 
-  const saveThresholdSettings = () => {
-    console.log('User-defined Thresholds:', thresholds);
-    checkBreachedThresholds(latestReadings); // Run comparison when saving thresholds
-  };
-
   const checkBreachedThresholds = (latestData) => {
     if (!latestData) {
       console.log('Latest data is null or undefined');
@@ -99,51 +93,61 @@ const AlertsPage = () => {
     setBreachedThresholds(breached);
   };
 
-  // Function to handle onFocus for all TextInput components
   const handleInputFocus = (key) => {
     const updatedThresholds = { ...thresholds };
     updatedThresholds[key] = ''; // Clear the value to start fresh
     setThresholds(updatedThresholds);
   };
 
+  const saveThresholdSettings = () => {
+    console.log('User-defined Thresholds:', thresholds);
+    checkBreachedThresholds(latestReadings); // Run comparison when saving thresholds
+  };
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <ScrollView>
-        {/* Display breached thresholds with notifications */}
-        {Object.keys(breachedThresholds).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Breached Thresholds</Text>
-            {Object.entries(breachedThresholds).map(([key, latestValue]) => (
-              <View key={key} style={styles.breachedContainer}>
-                <Text>{`Threshold of ${keyAlias[key]} was exceeded.`}</Text>
-                <Text>{`Latest reading of ${keyAlias[key]} was ${latestValue}`}</Text>
+        {!notificationsEnabled ? (
+          <View style={styles.disabledContainer}>
+            <Text style={styles.disabledText}>Notifications Disabled</Text>
+          </View>
+        ) : (
+          <>
+            {Object.keys(breachedThresholds).length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Breached Thresholds</Text>
+                {Object.entries(breachedThresholds).map(([key, latestValue]) => (
+                  <View key={key} style={styles.breachedContainer}>
+                    <Text>{`Threshold of ${keyAlias[key]} was exceeded.`}</Text>
+                    <Text>{`Latest reading of ${keyAlias[key]} was ${latestValue}`}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.title}>Thresholds</Text>
+
+            {/* Render inputs for threshold settings */}
+            {Object.keys(thresholds).map((key) => (
+              <View key={key} style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>{`Enter ${keyAlias[key]} threshold:`}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={thresholds[key]}
+                  onChangeText={(value) => setThresholds((prev) => ({ ...prev, [key]: value }))}
+                  keyboardType="numeric"
+                  placeholder={`Enter ${keyAlias[key]} threshold`}
+                  onFocus={() => handleInputFocus(key)}
+                />
               </View>
             ))}
-          </View>
+
+            {/* Save Thresholds Button */}
+            <TouchableOpacity style={styles.saveButton} onPress={saveThresholdSettings}>
+              <Text style={styles.saveButtonText}>Save Thresholds</Text>
+            </TouchableOpacity>
+          </>
         )}
-
-        {/* Title for Threshold Settings */}
-        <Text style={styles.title}>Thresholds</Text>
-
-        {/* Render inputs for threshold settings */}
-        {Object.keys(thresholds).map((key) => (
-          <View key={key} style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>{`Enter ${keyAlias[key]} threshold:`}</Text>
-            <TextInput
-              style={styles.input}
-              value={thresholds[key]}
-              onChangeText={(value) => setThresholds((prev) => ({ ...prev, [key]: value }))}
-              keyboardType="numeric"
-              placeholder={`Enter ${keyAlias[key]} threshold`}
-              onFocus={() => handleInputFocus(key)}
-            />
-          </View>
-        ))}
-
-        {/* Save Thresholds Button */}
-        <TouchableOpacity style={styles.saveButton} onPress={saveThresholdSettings}>
-          <Text style={styles.saveButtonText}>Save Thresholds</Text>
-        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center', // Center the title
+    textAlign: 'center', // Center-justify the title
   },
   inputContainer: {
     marginBottom: 20,
@@ -202,6 +206,17 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
+  },
+  disabledContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+  },
+  disabledText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'red',
   },
 });
 

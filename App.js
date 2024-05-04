@@ -7,8 +7,8 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get } from "firebase/database";
 import Dashboard from "./navigation/pages/dashboard";
 import History from "./navigation/pages/history";
-import Settings from "./navigation/pages/settings";
-import Alerts from "./navigation/pages/alerts";
+import SettingsPage from "./navigation/pages/settings";
+import AlertsPage from "./navigation/pages/alerts";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
@@ -29,6 +29,7 @@ export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
   const [temperatureUnit, setTemperatureUnit] = useState('Fahrenheit');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     const dbRef = ref(getDatabase(app));
@@ -99,11 +100,21 @@ export default function App() {
               {() => <Dashboard temperature={temperature} humidity={humidity} temperatureUnit={temperatureUnit} />}
           </Tab.Screen>
           <Tab.Screen name="History" component={History} />
-          <Tab.Screen name="Alerts" component={Alerts} />
-          <Tab.Screen name="Settings">
-              {() => <Settings temperatureUnit={temperatureUnit} setTemperatureUnit={setTemperatureUnit} />}
+          <Tab.Screen name="Alerts">
+              {() => (
+                <AlertsPage notificationsEnabled={notificationsEnabled} />
+              )}
           </Tab.Screen>
-          
+          <Tab.Screen name="Settings">
+              {() => (
+                <SettingsPage
+                  temperatureUnit={temperatureUnit}
+                  setTemperatureUnit={setTemperatureUnit}
+                  notificationsEnabled={notificationsEnabled}
+                  setNotificationsEnabled={setNotificationsEnabled}
+                />
+              )}
+          </Tab.Screen>
       </Tab.Navigator>
     </NavigationContainer>
   );

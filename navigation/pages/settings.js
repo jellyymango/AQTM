@@ -1,31 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 
-export default function SettingsPage({ temperatureUnit, setTemperatureUnit }) {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+const SettingsPage = ({ temperatureUnit, setTemperatureUnit, notificationsEnabled, setNotificationsEnabled }) => {
+  const toggleTemperatureUnit = () => {
+    setTemperatureUnit(temperatureUnit === 'Fahrenheit' ? 'Celsius' : 'Fahrenheit');
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
-      
+
       {/* Appearance Settings */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Appearance</Text>
         <View style={styles.setting}>
           <Text>Dark Mode</Text>
-          <Switch value={darkMode} onValueChange={setDarkMode} />
+          <Switch value={false} />
         </View>
-
         <View style={styles.setting}>
           <Text>Temperature Unit:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text>{temperatureUnit === 'Fahrenheit'? 'Fahrenheit' : 'Celsius'}</Text>
-            <View style={{ width: 10 }} /> 
-            <Switch
-              value={temperatureUnit === 'Fahrenheit'}
-              onValueChange={() => setTemperatureUnit(temperatureUnit === 'Fahrenheit'? 'Celsius' : 'Fahrenheit')}
-            />
+            <Text>{temperatureUnit}</Text>
+            <Switch value={temperatureUnit === 'Fahrenheit'} onValueChange={toggleTemperatureUnit} />
           </View>
         </View>
       </View>
@@ -40,7 +36,7 @@ export default function SettingsPage({ temperatureUnit, setTemperatureUnit }) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -68,3 +64,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+export default SettingsPage;
