@@ -183,7 +183,6 @@ const History = ({ navigation }) => {
       <Text
         onPress={() => navigation.navigate('Dashboard')}
         style={{ fontSize: 26, fontWeight: 'bold' }}>
-        History
       </Text>
       <LineChart
         data={data[selectedIndex]}

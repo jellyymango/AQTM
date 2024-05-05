@@ -9,6 +9,7 @@ import Dashboard from "./navigation/pages/dashboard";
 import History from "./navigation/pages/history";
 import SettingsPage from "./navigation/pages/settings";
 import AlertsPage from "./navigation/pages/alerts";
+import { Font } from 'expo';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCY7Edr61G516jEG8YIOEOqsOddHPFdFSY",
@@ -28,8 +29,15 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
+  const [form, setForm] = useState(null);
+  const [nox, setNox] = useState(null);
+  const [voc, setVoc] = useState(null);
   const [temperatureUnit, setTemperatureUnit] = useState('Celsius');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const customFonts = {
+    OpenSans: require('./assets/fonts/OpenSans-Light.ttf'),
+  };
+  
 
   useEffect(() => {
     const dbRef = ref(getDatabase(app));
@@ -62,6 +70,9 @@ export default function App() {
       // Set temperature and humidity based on the data with the highest timestamp
       setTemperature(latestData.temperature);
       setHumidity(latestData.humidity);
+      setForm(latestData.Formaldehyde);
+      setNox(latestData.NOX);
+      setVoc(latestData.VOC);
     };
 
     getLatestReading();
@@ -97,12 +108,12 @@ export default function App() {
           })}
       >
           <Tab.Screen name="Dashboard">
-              {() => <Dashboard temperature={temperature} humidity={humidity} temperatureUnit={temperatureUnit} />}
+              {() => <Dashboard temperature={temperature} humidity={humidity} temperatureUnit={temperatureUnit} form={form} nox={nox} voc={voc} customFonts={customFonts}/>}
           </Tab.Screen>
           <Tab.Screen name="History" component={History} />
           <Tab.Screen name="Alerts">
               {() => (
-                <AlertsPage notificationsEnabled={notificationsEnabled} />
+                <AlertsPage notificationsEnabled={notificationsEnabled} customFonts={customFonts}/>
               )}
           </Tab.Screen>
           <Tab.Screen name="Settings">

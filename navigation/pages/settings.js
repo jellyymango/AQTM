@@ -13,10 +13,7 @@ const SettingsPage = ({ temperatureUnit, setTemperatureUnit, notificationsEnable
       {/* Appearance Settings */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Appearance</Text>
-        <View style={styles.setting}>
-          <Text>Dark Mode</Text>
-          <Switch value={false} />
-        </View>
+        
         <View style={styles.setting}>
           <Text>Dashboard Temperature Unit:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
