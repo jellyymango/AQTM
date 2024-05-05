@@ -26,3 +26,8 @@ This repository contains the source code for the AQTM mobile application. Instru
 --If any remaining dependencies are specified as uninstalled, follow instructions to install them
 
 --Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application and display QR code for the Expo Go mobile app
+
+
+
+
+****************THE HARDWARE SETUP WILL BE INSIDE THE HW Arduino Code FOLDER, THERE WILL BE ANOTHER READ ME ************
