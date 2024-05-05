@@ -29,12 +29,18 @@ This repository contains the source code for the AQTM mobile application. Instru
     -yarn add react-native-svg
     -npm i @expo/webpack-config
     -npx expo install expo-location
-    -npx install expo-notifications
+    -npx expo install expo-notifications
 
---If any remaining dependencies are specified as uninstalled, follow instructions to install them
+--Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application once, then press 
+CTRL+C to stop server.
 
---Inside of ./AQTM/AQTM, run 'npx expo start' in a Command Prompt (not Powershell) window to start the application and display QR code for the Expo Go mobile app
+--Run the following command to install any final missing dependencies:
 
+    -npx expo install --fix
+
+--Now, running 'npx expo start' inside of the ./AQTM/AQTM directory will start the application, providing a QR code.
+
+--On the mobile device, ensure Expo Go is installed and scan the QR code with the device camera. The application should now launch.
 
 
 
