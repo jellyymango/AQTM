@@ -3,7 +3,7 @@ import { View, Text, Switch, StyleSheet } from 'react-native';
 
 const SettingsPage = ({ temperatureUnit, setTemperatureUnit, notificationsEnabled, setNotificationsEnabled }) => {
   const toggleTemperatureUnit = () => {
-    setTemperatureUnit(temperatureUnit === 'Fahrenheit' ? 'Celsius' : 'Fahrenheit');
+    setTemperatureUnit(temperatureUnit === 'Celsius'? 'Fahrenheit' : 'Celsius');
   };
 
   return (
@@ -18,10 +18,12 @@ const SettingsPage = ({ temperatureUnit, setTemperatureUnit, notificationsEnable
           <Switch value={false} />
         </View>
         <View style={styles.setting}>
-          <Text>Temperature Unit:</Text>
+          <Text>Dashboard Temperature Unit:</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text>{temperatureUnit}</Text>
-            <Switch value={temperatureUnit === 'Fahrenheit'} onValueChange={toggleTemperatureUnit} />
+            <View style={{ marginLeft: 10 }}>
+              <Switch value={temperatureUnit === 'Fahrenheit'} onValueChange={toggleTemperatureUnit} />
+            </View>
           </View>
         </View>
       </View>

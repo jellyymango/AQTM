@@ -28,7 +28,7 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
-  const [temperatureUnit, setTemperatureUnit] = useState('Fahrenheit');
+  const [temperatureUnit, setTemperatureUnit] = useState('Celsius');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
